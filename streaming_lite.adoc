@@ -9,8 +9,8 @@ In this workshop you'll implement a data pipeline, using NiFi to ingest data fro
 * *Lab 3* - On the NiFi cluster, prepare the data and send it to the *Kafka* cluster.
 * *Lab 4* - On the *Streams Messaging Manager (SMM)* Web UI, monitor the Kafka cluster and confirm data is being ingested correctly.
 * *Lab 5* - Use NiFi to consume each record from *Kafka* and save results to *Kudu*.
-* *Lab 5* - FLINK !!! <- *ToDo*
 * *Lab 6* - Check the data on Kudu.
+* *Lab 7* - FLINK !!! <- *ToDo*
 
 [[lab_1, Lab 1]]
 == Lab 1 - Apache NiFi: setup machine sensors simulator 
@@ -464,3 +464,5 @@ LIMIT 100;
 +
 image::images/table_select_lite.png[width=800]
 
+[[lab_7, Lab 7]]
+== Lab 7 - Apache Flink- your friend for streaming use cases

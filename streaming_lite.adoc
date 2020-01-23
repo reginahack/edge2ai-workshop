@@ -9,7 +9,8 @@ In this workshop you'll implement a data pipeline, using MiNiFi and NiFi to inge
 * *Lab 3* - On the NiFi cluster, prepare the data and send it to the **Kafka** cluster.
 * *Lab 4* - On the *Streams Messaging Manager (SMM)* Web UI, monitor the Kafka cluster and confirm data is being ingested correctly.
 * *Lab 5* - Use NiFi to process each record, calling the **Model endpoint** and save results to **Kudu**.
-* *Lab 8* - Check the data on Kudu.
+* *Lab 5* - FLINK !!!
+* *Lab 6* - Check the data on Kudu.
 
 [[lab_1, Lab 1]]
 == Lab 1 - Apache NiFi: setup machine sensors simulator 
@@ -311,22 +312,10 @@ Schema Registry:        HortonworksSchemaRegistry
 
 . Click on the _lightning bolt_ icon (image:images/enable_icon.png[width=20]) to *enable* the *JsonTreeReader - With schema identifier* controller service.
 
-. Click again on the _plus_ button (image:images/plus_button.png[width=25]), add a *RestLookupService* controller service, configure it as shown below and click *Apply* when you're done:
-+
-On the *PROPERTIES* tab:
-+
-[source]
-----
-URL:           http://cdsw.<YOUR_CLUSTER_PUBLIC_IP>.nip.io/api/altus-ds-1/models/call-model
-Record Reader: JsonTreeReader
-Record Path:   /response
-----
-+
-NOTE: `<YOUR_CLUSTER_PUBLIC_IP>` above must be replaced with your cluster's public IP, *not* DNS name. The final URL should look something like this: `\http://cdsw.12.34.56.78.nip.io/api/altus-ds-1/models/call-model`
 
 . Click on the _lightning bolt_ icon (image:images/enable_icon.png[width=20]) to *enable* the *RestLookupService* controller service.
 +
-image::images/additional_controller_services.png[width=800]
+image::images/additional_controller_services_lite.png[width=800]
 
 . Close the *Process Sensor Data Configuration* page.
 
@@ -334,7 +323,7 @@ image::images/additional_controller_services.png[width=800]
 
 We'll now create the flow to read the sensor data from Kafka, execute a model prediction for each of them and write the results to Kudu. At the end of this section you flow should look like the one below:
 
-image::images/from_kafka_to_kudu_flow.png[width=800]
+image::images/from_kafka_to_kudu_flow_lite.png[width=800]
 
 ==== ConsumeKafkaRecord_2_0 processor
 
@@ -364,78 +353,9 @@ Offset Reset:                         latest
 Headers to Add as Attributes (Regex): schema.*
 ----
 
-. Add a new _Funnel_ to the canvas and connect the *Consume Kafka iot messages* to it. When prompted, check the *parse.failure* relationship for this connection:
+. Reuse existing _Funnel_ to the canvas and connect the *Consume Kafka iot messages* to it. When prompted, check the *parse.failure* relationship for this connection:
 +
 image:images/parse_failure_relationship.png[width=500]
-
-==== LookupRecord processor
-
-. Add a *LookupRecord* processor to the canvas and configure it as shown below:
-+
-*SETTINGS* tab:
-+
-[source]
-----
-Name: Predict machine health
-----
-+
-*PROPERTIES* tab:
-+
-[source]
-----
-Record Reader:          JsonTreeReader - With schema identifier
-Record Writer:          JsonRecordSetWriter
-Lookup Service:         RestLookupService
-Result RecordPath:      /response
-Routing Strategy:       Route to 'success'
-Record Result Contents: Insert Entire Record
-----
-
-. Add 3 more user-defined properties by clicking on the _plus_ button (image:images/plus_button.png[width=25]) for each of them:
-+
-[source]
-----
-mime.type:      toString('application/json', 'UTF-8')
-request.body:   concat('{"accessKey":"', '${cdsw.access.key}', '","request":{"feature":"', /sensor_0, ', ', /sensor_1, ', ', /sensor_2, ', ', /sensor_3, ', ', /sensor_4, ', ', /sensor_5, ', ', /sensor_6, ', ', /sensor_7, ', ', /sensor_8, ', ', /sensor_9, ', ', /sensor_10, ', ', /sensor_11, '"}}')
-request.method: toString('post', 'UTF-8')
-----
-
-. Click *Apply* to save the changes to the *Predict machine health* processor.
-
-. Connect the *Consume Kafka iot messages* processor to the *Predict machine health* one. When prompted, check the *success* relationship for this connection.
-
-. Connect the *Predict machine health* to the same _Funnel_ you had created above. When prompted, check the *failure* relationship for this connection.
-
-==== UpdateRecord processor
-
-. Add a *UpdateRecord* processor to the canvas and configure it as shown below:
-+
-*SETTINGS* tab:
-+
-[source]
-----
-Name: Update health flag
-----
-+
-*PROPERTIES* tab:
-+
-[source]
-----
-Record Reader:              JsonTreeReader - With schema identifier
-Record Writer:              JsonRecordSetWriter
-Replacement Value Strategy: Record Path Value
-----
-
-. Add one more user-defined propertie by clicking on the _plus_ button (image:images/plus_button.png[width=25]):
-+
-[source]
-----
-/is_healthy: /response/result
-----
-
-. Connect the *Predict machine health* processor to the *Update health flag* one. When prompted, check the *success* relationship for this connection.
-
-. Connect the *Update health flag* to the same _Funnel_ you had created above. When prompted, check the *failure* relationship for this connection.
 
 ==== PutKudu processor
 
@@ -457,33 +377,11 @@ Table Name:       impala::default.sensors
 Record Reader:    JsonTreeReader - With schema identifier
 ----
 
-. Connect the *Update health flag* processor to the *Write to Kudu* one. When prompted, check the *success* relationship for this connection.
+. Connect the *Consume Kafka iot message* processor to the *Write to Kudu* one. When prompted, check the *success* relationship for this connection.
 
 . Connect the *Write to Kudu* to the same _Funnel_ you had created above. When prompted, check the *failure* relationship for this connection.
 
 . Double-click on the *Write to Kudu* processor, go to the *SETTINGS* tab, check the "*success*" relationship in the *AUTOMATICALLY TERMINATED RELATIONSHIPS* section. Click *Apply*.
-
-==== CDSW Access Key
-
-When we added the *Predict machine health* above, you may have noticed that one of the properties (`request.body`) makes a reference to a variable called `cdsw.access.key`. This is an application key required to authenticate with the CDSW Model API when requesting predictions. So, we need to provide the key to the _LookupRecord_ processor by setting a variable with its value.
-
-. To get the Access Key, go to the CDSW Web UI and click on *Models > Iot Prediction Model > Settings*. Copy the Access Key.
-+
-image::images/model_access_key.png[width=800]
-
-. Go back to the NiFi Web UI, right-click on an empty area of the *Process Sensor Data* canvas, and click on *Variables*.
-
-. Click on the _plus_ button (image:images/plus_button.png[width=25]) and add the following variable:
-+
-[source]
-----
-Variable Name:  cdsw.access.key
-Variable Value: <key copied from CDSW>
-----
-+
-image::images/access_key_variable.png[width=800]
-
-. Click *Apply*
 
 ==== Create the Kudu table
 
@@ -533,10 +431,10 @@ We're ready now to run and test our flow. Follow the steps below:
 
 . Refresh your NiFi page and you should see messages passing through your flow. The failure queues should have no records queued up.
 +
-image::images/kudu_success.png[width=800]
+image::images/kudu_success_lite.png[width=800]
 
-[[lab_8, Lab 8]]
-== Lab 8 - Check the data on Kudu
+[[lab_6, Lab 6]]
+== Lab 6 - Check the data on Kudu
 
 In this lab, you will run some SQL queries using the Impala engine and verify that the Kudu table is being updated as expected.
 

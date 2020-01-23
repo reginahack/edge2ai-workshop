@@ -287,7 +287,6 @@ When the sensor data was sent to Kafka using the _PublishKafkaRecord_ processor,
 
 To do this, though, we need to configure a different _JsonTreeReader_ that will use the schema properties in the header, instead of the `${schema.name}` attribute, as we did before.
 
-We'll also add a new _RestLookupService_ controller service to perform the calls to the CDSW model API endpoint.
 
 . If you're not in the *Process Sensor Data* process group, double-click on it to expand it. On the *Operate* panel (left-hand side), click on the _cog_ icon (image:images/cog_icon.png[width=25]) to access the *Process Sensor Data* process group's configuration page.
 +
@@ -313,7 +312,6 @@ Schema Registry:        HortonworksSchemaRegistry
 . Click on the _lightning bolt_ icon (image:images/enable_icon.png[width=20]) to *enable* the *JsonTreeReader - With schema identifier* controller service.
 
 
-. Click on the _lightning bolt_ icon (image:images/enable_icon.png[width=20]) to *enable* the *RestLookupService* controller service.
 +
 image::images/additional_controller_services_lite.png[width=800]
 

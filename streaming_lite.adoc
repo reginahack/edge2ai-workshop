@@ -521,18 +521,19 @@ image::images/iot_streamingIntro_lite.png[width=800]
 *Dataflow:*
 +
 .. Build the environment
-.. Deserializer for the JSON object
-.. Split by key - in this case 'sensor_id' & count over 10 sec.
-.. Serializer a JSON object
-.. Publishing to a new kafka topic
-+
-**get iot stream from kafka - topic "iot"**
 +
 [source,java]
 ----
+StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+
+
+// get iot stream from kafka - topic "iot"
 DataStream<String> opcStream = env.addSource(
    new FlinkKafkaConsumer<>("iot", new SimpleStringSchema(), properties));
 ----
++
+.. Deserializer for the JSON object
 +
 [source,java]
 ----
@@ -552,10 +553,23 @@ public void flatMap(String value, Collector<Tuple5<Long, Integer, Integer, Integ
 }
 ----
 +
-*serialize* the tuple into a JSON to publish a user friendly object into the new kafka topic
+.. Split by key - in this case 'sensor_id' & count over 10 sec.
 +
 [source,java]
 ----
+// split and sum on 'sensor_id'
+DataStream<Tuple5<Long, Integer, Integer, Integer, Integer>> aggStream = opcStream
+   .flatMap(new trxJSONDeserializer())
+   .keyBy(1)
+   .window(TumblingProcessingTimeWindows.of(Time.seconds(10)))
+   .sum(4)  ;
+----
++
+.. Serializer a JSON object
++
+[source,java]
+----
+// serialize the tuple into a JSON to publish a user friendly object into the new kafka topic
 public byte[] serializeValue(Tuple5 value) {
 
   String str = "{"
@@ -566,4 +580,14 @@ public byte[] serializeValue(Tuple5 value) {
     + "," + "\"window_count\"" + ":" + value.getField(4).toString() + "}";
   return str.getBytes();
 }
+----
+.. Publishing to a new kafka topic
++
+[source,java]
+----
+// write the aggregated data stream to a Kafka sink
+aggStream.addSink(new FlinkKafkaProducer<>(
+  Commons.EXAMPLE_KAFKA_SERVER,
+  "simulation_sum",
+  new serializeSum2String()));
 ----

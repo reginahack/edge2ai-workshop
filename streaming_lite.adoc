@@ -471,6 +471,10 @@ image::images/table_select_lite.png[width=800]
 +
 Now, we are going to run this Flink application. It will read text from a socket and once every 5 seconds print the number of occurrences of each distinct word during the previous 5 seconds, i.e. a *tumbling window* of processing time, as long as words are floating in.
 +
+.. Open a SSH connection to your environment
++
+Todo *image*
++
 .. First of all, we use netcat to start local server via:
 +
 [source,shell]
@@ -478,7 +482,7 @@ Now, we are going to run this Flink application. It will read text from a socket
 $ nc -l 9000
 ----
 +
-.. Submit the Flink program:
+.. open a second connection and submit the Flink program:
 +
 [source,shell]
 ----
@@ -492,8 +496,9 @@ $ ./bin/flink run examples/streaming/SocketWindowWordCount.jar --port 9000
 [source,shell]
 ----
 $ nc -l 9000
-lorem ipsum
-ipsum ipsum ipsum
+cloudera data platform
+data driven
+cloudera
 bye
 ----
 +
@@ -502,9 +507,11 @@ bye
 [source,shell]
 ----
 $ tail -f log/flink-*-taskexecutor-*.out
-lorem : 1
+cloudera : 2
+data : 2
+platform : 1
+driven : 1
 bye : 1
-ipsum : 4
 ----
 
 . Let's use the stream form the sensors from the previous lab

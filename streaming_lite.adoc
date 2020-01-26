@@ -467,8 +467,46 @@ image::images/table_select_lite.png[width=800]
 [[lab_7, Lab 7]]
 == Lab 7 - Apache Flink- your friend for streaming use cases
 
-. 'WordCount' the 'HelloWorld' of streaming
+. Run the Example: 'WordCount' the 'HelloWorld' of streaming
 +
+Now, we are going to run this Flink application. It will read text from a socket and once every 5 seconds print the number of occurrences of each distinct word during the previous 5 seconds, i.e. a *tumbling window* of processing time, as long as words are floating in.
++
+.. First of all, we use netcat to start local server via:
++
+[source,shell]
+----
+$ nc -l 9000
+----
++
+.. Submit the Flink program:
++
+[source,shell]
+----
+$ ./bin/flink run examples/streaming/SocketWindowWordCount.jar --port 9000
+----
++
+.. The program connects to the socket and waits for input. You can check the web interface to verify that the job is running as expected.
++
+.. feed some data
++
+[source,shell]
+----
+$ nc -l 9000
+lorem ipsum
+ipsum ipsum ipsum
+bye
+----
++
+.. The .out file will print the counts at the end of each time window as long as words are floating in, e.g.:
++
+[source,shell]
+----
+$ tail -f log/flink-*-taskexecutor-*.out
+lorem : 1
+bye : 1
+ipsum : 4
+----
+
 . Let's use the stream form the sensors from the previous lab
 +
 image::images/iot_streamingIntro_lite.png[width=800]

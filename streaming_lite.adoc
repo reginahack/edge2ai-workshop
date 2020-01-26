@@ -459,10 +459,66 @@ FROM sensors
 ORDER by sensor_ts DESC
 LIMIT 100;
 ----
-
++
 . Run the queries a few times \and verify that the number of sensor readings are increasing as the data is ingested into the Kudu table. This allows you to build real-time reports for fast action.
 +
 image::images/table_select_lite.png[width=800]
 
 [[lab_7, Lab 7]]
 == Lab 7 - Apache Flink- your friend for streaming use cases
+
+. 'WordCount' the 'HelloWorld' of streaming
++
+. Let's use the stream form the sensors from the previous lab
++
+image::images/iot_streamingIntro_lite.png[width=800]
++
+*Dataflow:*
++
+.. Build the environment
+.. Deserializer for the JSON object
+.. Split by key - in this case 'sensor_id' & count over 10 sec.
+.. Serializer a JSON object
+.. Publishing to a new kafka topic
++
+**get iot stream from kafka - topic "iot"**
++
+[source,java]
+----
+DataStream<String> opcStream = env.addSource(
+   new FlinkKafkaConsumer<>("iot", new SimpleStringSchema(), properties));
+----
++
+[source,java]
+----
+public byte[] serializeValue(Tuple5 value) {
+public void flatMap(String value, Collector<Tuple5<Long, Integer, Integer, Integer, Integer>> out) throws Exception {
+   if (jsonParser == null) {
+   jsonParser = new ObjectMapper();
+   }
+   JsonNode jsonNode = jsonParser.readValue(value, JsonNode.class);
+
+   // get sensor_ts,  sensor_id, sensor_0 and sensor_1 from JSONObject which we have get from Kafka topic 'iot'
+   Long sensor_ts = jsonNode.get("sensor_ts").asLong();
+   Integer sensor_id = jsonNode.get("sensor_id").asInt();
+   Integer sensor_0 = jsonNode.get("sensor_0").asInt();
+   Integer sensor_1 = jsonNode.get("sensor_1").asInt();
+   out.collect(new Tuple5<>(sensor_ts, sensor_id, sensor_0, sensor_1, 1));
+}
+----
++
+*serialize* the tuple into a JSON to publish a user friendly object into the new kafka topic
++
+[source,java]
+----
+public byte[] serializeValue(Tuple5 value) {
+
+  String str = "{"
+    + "\"type\"" + ":" +"\"Sum over 10 sec window\""
+    + "," + "\"sensor_ts_start\"" + ":" + value.getField(0).toString()
+    + "," + "\"sensor_id\"" + ":" + value.getField(1).toString()
+    + "," + "\"sensor_0\"" + ":" + value.getField(2).toString()
+    + "," + "\"window_count\"" + ":" + value.getField(4).toString() + "}";
+  return str.getBytes();
+}
+----

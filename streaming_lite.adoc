@@ -475,13 +475,12 @@ Now, we are going to run this Flink application. It will read text from a socket
 +
 image::images/flink_ssl_lite.png[width=800]
 +
-Todo *change directory*
-
-+
 .. First of all, we use netcat to start local server via:
 +
 [source,shell]
 ----
+$ sudo su
+$ yum install nmap
 $ nc -l 9000
 ----
 +

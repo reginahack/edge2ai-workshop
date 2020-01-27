@@ -10,7 +10,7 @@ In this workshop you'll implement a data pipeline, using NiFi to ingest data fro
 * *Lab 4* - On the *Streams Messaging Manager (SMM)* Web UI, monitor the Kafka cluster and confirm data is being ingested correctly.
 * *Lab 5* - Use NiFi to consume each record from *Kafka* and save results to *Kudu*.
 * *Lab 6* - Check the data on Kudu.
-* *Lab 7* - FLINK !!! <- *ToDo*
+* *Lab 7* - Apache Flink- your friend for streaming use cases
 
 [[lab_1, Lab 1]]
 == Lab 1 - Apache NiFi: setup machine sensors simulator 
@@ -473,7 +473,10 @@ Now, we are going to run this Flink application. It will read text from a socket
 +
 .. Open a SSH connection to your environment
 +
-Todo *image*
+image::images/flink_ssl_lite.png[width=800]
++
+Todo *change directory*
+
 +
 .. First of all, we use netcat to start local server via:
 +
@@ -486,6 +489,7 @@ $ nc -l 9000
 +
 [source,shell]
 ----
+$ cd /opt/cloudera/parcels/FLINK
 $ ./bin/flink run examples/streaming/SocketWindowWordCount.jar --port 9000
 ----
 +
@@ -506,6 +510,7 @@ bye
 +
 [source,shell]
 ----
+$ cd /opt/cloudera/parcels/FLINK
 $ tail -f log/flink-*-taskexecutor-*.out
 cloudera : 2
 data : 2

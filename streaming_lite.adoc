@@ -480,8 +480,9 @@ image::images/flink_ssl_lite.png[width=800]
 [source,shell]
 ----
 $ sudo su
-$ yum install nmap
-$ nc -l 9000
+$ yum install -y nmap
+$ exit
+$ nc -l 9999  -- todo
 ----
 +
 .. open a second connection and submit the Flink program:
@@ -489,7 +490,7 @@ $ nc -l 9000
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/FLINK
-$ ./bin/flink run examples/streaming/SocketWindowWordCount.jar --port 9000
+$ ./bin/flink run lib/flink/examples/streaming/SocketWindowWordCount.jar --port 9999
 ----
 +
 .. The program connects to the socket and waits for input. You can check the web interface to verify that the job is running as expected.
@@ -498,7 +499,7 @@ $ ./bin/flink run examples/streaming/SocketWindowWordCount.jar --port 9000
 +
 [source,shell]
 ----
-$ nc -l 9000
+$ nc -l 9999
 cloudera data platform
 data driven
 cloudera
@@ -519,6 +520,8 @@ bye : 1
 ----
 
 . Let's use the stream form the sensors from the previous lab
++
+ToDo
 +
 image::images/iot_streamingIntro_lite.png[width=800]
 +
@@ -595,3 +598,19 @@ aggStream.addSink(new FlinkKafkaProducer<>(
   "simulation_sum",
   new serializeSum2String()));
 ----
++
+. Let's run it
++
+[source,shell]
+----
+$ sudo wget https://github.com/zBrainiac/edge2ailab/releases/download/0.2.0/edge2ai-lab-0.2.0.jar /opt/cloudera/parcels/FLINK/lib/fl
+ink/e xamples/streaming
+$ run -- ToDo
+$ ./bin/flink run lib/flink/examples/streaming/edge2ai-lab-0.2.0.jar
+
+$ ./bin/flink run lib/flink/examples/streaming/edge2ai-lab-0.2.0.jar FlinkConsumer.iotConsumer
+$ ./bin/flink run -c FlinkConsumer.iotConsumer examples/streaming/edge2ai-lab-0.2.0.jar
+
+
+----
+

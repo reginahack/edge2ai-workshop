@@ -482,7 +482,7 @@ image::images/flink_ssl_lite.png[width=800]
 $ sudo su
 $ yum install -y nmap
 $ exit
-$ nc -l 9999  -- todo
+$ nc -l 9999
 ----
 +
 .. open a second connection and submit the Flink program:
@@ -490,7 +490,7 @@ $ nc -l 9999  -- todo
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/FLINK
-$ ./bin/flink run lib/flink/examples/streaming/SocketWindowWordCount.jar --port 9999
+$ ./bin/flink run --jobmanager yarn-cluster lib/flink/examples/streaming/SocketWindowWordCount.jar --port 9999
 ----
 +
 .. The program connects to the socket and waits for input. You can check the web interface to verify that the job is running as expected.

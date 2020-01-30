@@ -490,7 +490,7 @@ $ nc -l 9999
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/FLINK
-$ ./bin/flink run --jobmanager yarn-cluster lib/flink/examples/streaming/SocketWindowWordCount.jar --port 9999
+$ ./bin/flink run -m yarn-cluster  -d  -p1 -ys 2 -ynm myFlinkWordCount  -c org.apache.flink.streaming.examples.socket.SocketWindowWordCount  lib/flink/examples/streaming/SocketWindowWordCount.jar --port 9999
 ----
 +
 .. The program connects to the socket and waits for input. You can check the web interface to verify that the job is running as expected.
@@ -527,90 +527,13 @@ image::images/iot_streamingIntro_lite.png[width=800]
 +
 *Dataflow:*
 +
-.. Build the environment
+.. update NiFi Flow - send data to new kafka topic 'highTemp'
 +
-[source,java]
-----
-StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-
-
-// get iot stream from kafka - topic "iot"
-DataStream<String> opcStream = env.addSource(
-   new FlinkKafkaConsumer<>("iot", new SimpleStringSchema(), properties));
-----
-+
-.. Deserializer for the JSON object
-+
-[source,java]
-----
-public byte[] serializeValue(Tuple5 value) {
-public void flatMap(String value, Collector<Tuple5<Long, Integer, Integer, Integer, Integer>> out) throws Exception {
-   if (jsonParser == null) {
-   jsonParser = new ObjectMapper();
-   }
-   JsonNode jsonNode = jsonParser.readValue(value, JsonNode.class);
-
-   // get sensor_ts,  sensor_id, sensor_0 and sensor_1 from JSONObject which we have get from Kafka topic 'iot'
-   Long sensor_ts = jsonNode.get("sensor_ts").asLong();
-   Integer sensor_id = jsonNode.get("sensor_id").asInt();
-   Integer sensor_0 = jsonNode.get("sensor_0").asInt();
-   Integer sensor_1 = jsonNode.get("sensor_1").asInt();
-   out.collect(new Tuple5<>(sensor_ts, sensor_id, sensor_0, sensor_1, 1));
-}
-----
-+
-.. Split by key - in this case 'sensor_id' & count over 10 sec.
-+
-[source,java]
-----
-// split and sum on 'sensor_id'
-DataStream<Tuple5<Long, Integer, Integer, Integer, Integer>> aggStream = opcStream
-   .flatMap(new trxJSONDeserializer())
-   .keyBy(1)
-   .window(TumblingProcessingTimeWindows.of(Time.seconds(10)))
-   .sum(4)  ;
-----
-+
-.. Serializer a JSON object
-+
-[source,java]
-----
-// serialize the tuple into a JSON to publish a user friendly object into the new kafka topic
-public byte[] serializeValue(Tuple5 value) {
-
-  String str = "{"
-    + "\"type\"" + ":" +"\"Sum over 10 sec window\""
-    + "," + "\"sensor_ts_start\"" + ":" + value.getField(0).toString()
-    + "," + "\"sensor_id\"" + ":" + value.getField(1).toString()
-    + "," + "\"sensor_0\"" + ":" + value.getField(2).toString()
-    + "," + "\"window_count\"" + ":" + value.getField(4).toString() + "}";
-  return str.getBytes();
-}
-----
-.. Publishing to a new kafka topic
-+
-[source,java]
-----
-// write the aggregated data stream to a Kafka sink
-aggStream.addSink(new FlinkKafkaProducer<>(
-  Commons.EXAMPLE_KAFKA_SERVER,
-  "simulation_sum",
-  new serializeSum2String()));
-----
-+
-. Let's run it
+.. Let's run it
 +
 [source,shell]
 ----
-$ sudo wget https://github.com/zBrainiac/edge2ailab/releases/download/0.2.0/edge2ai-lab-0.2.0.jar /opt/cloudera/parcels/FLINK/lib/fl
-ink/e xamples/streaming
-$ run -- ToDo
-$ ./bin/flink run lib/flink/examples/streaming/edge2ai-lab-0.2.0.jar
-
-$ ./bin/flink run lib/flink/examples/streaming/edge2ai-lab-0.2.0.jar FlinkConsumer.iotConsumer
-$ ./bin/flink run -c FlinkConsumer.iotConsumer examples/streaming/edge2ai-lab-0.2.0.jar
-
-
+$ sudo wget https://github.com/vvagias/edge2ai-workshop/blob/master/flink/vv2-1.0-SNAPSHOT.jar lib/flink/examples/streaming
+$ ./bin/flink run -m yarn-cluster lib/flink/examples/streaming/vv2-1.0-SNAPSHOT.jar
 ----
 

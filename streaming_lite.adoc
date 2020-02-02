@@ -498,7 +498,20 @@ SSH connection
 +
 image::images/Kafka_topic_simulation_sum.png[width=800]
 +
-SMM view:
+.. SMM view:
 +
 image::images/SMM_topic_simulation_sum.png[width=800]
 +
+.. YARN & FLINK UI view:
++
+goto Cloudera Manager > YARN > Applications
++
+image::images/YARN_Application.png[width=800]
++
+see details of the running Flink job and use the <Tracking URL>
++
+image::images/YARN_Application_details.png[width=800]
++
+Flink UI provide more details and monitoring of the job
++
+image::images/FLINk_running_jobs.png[width=800]

@@ -471,22 +471,34 @@ image::images/table_select_lite.png[width=800]
 +
 .. *Dataflow:*
 +
-ToDo
-+
 image::images/iot_streamingIntro_lite.png[width=800]
 +
-.. Open a SSH connection to your environment
+.. Open two SSH connections to your environment
 +
 image::images/flink_ssl_lite.png[width=800]
-.. update NiFi Flow - send data to new kafka topic 'highTemp'$
 +
-ToDo
-+
-.. Let's run it
+.. use the first SSH connection to run the Flink application
 +
 [source,shell]
 ----
-$ sudo wget https://github.com/vvagias/edge2ai-workshop/blob/master/flink/vv2-1.0-SNAPSHOT.jar lib/flink/examples/streaming
-$ ./bin/flink run -m yarn-cluster lib/flink/examples/streaming/vv2-1.0-SNAPSHOT.jar
+$ cd /opt/cloudera/parcels/FLINK
+$ sudo wget https://github.com/zBrainiac/edge2ailab/releases/download/0.2.0/edge2ailab-0.2.0-jar-with-dependencies.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
+$ ./bin/flink run -m yarn-cluster -c FlinkConsumer.iotConsumer lib/flink/examples/streaming/edge2ailab-0.2.0-jar-with-dependencies.jar
 ----
-
++
+.. use the second SSH connection to see the result
++
+[source,shell]
+----
+$ cd /opt/cloudera/parcels/CDH
+$ ./bin/kafka-console-consumer --bootstrap-server edge2ai-1.dim.local:9092 --topic simulation_sum
+----
++
+SSH connection
++
+image::images/Kafka_topic_simulation_sum.png[width=800]
++
+SMM view:
++
+image::images/SMM_topic_simulation_sum.png[width=800]
++

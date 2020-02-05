@@ -483,7 +483,7 @@ image::images/flink_ssl_lite.png[width=800]
 ----
 $ cd /opt/cloudera/parcels/FLINK
 $ sudo wget https://github.com/zBrainiac/edge2ailab/releases/download/0.2.0/edge2ailab-0.2.0-jar-with-dependencies.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
-$ ./bin/flink run -m yarn-cluster -c FlinkConsumer.iotConsumer lib/flink/examples/streaming/edge2ailab-0.2.0-jar-with-dependencies.jar
+$ ./bin/flink run -m yarn-cluster -c FlinkConsumer.iotConsumer -ynm myFistFlinkApp lib/flink/examples/streaming/edge2ailab-0.2.0-jar-with-dependencies.jar
 ----
 +
 .. use the second SSH connection to see the result

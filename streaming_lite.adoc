@@ -240,7 +240,7 @@ image::images/add_kafka_failure_connection.png[width=600]
 +
 image::images/terminate_publishkafka_relationship.png[width=600]
 
-. Start the input port and the two processors. Your canvas should now look like the one below:
+. Start all three processors. Your canvas should now look like the one below:
 +
 image::images/publishKafka_flow_lite.png[width=800]
 

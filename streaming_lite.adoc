@@ -477,14 +477,49 @@ image::images/iot_streamingIntro_lite.png[width=800]
 +
 image::images/flink_ssl_lite.png[width=800]
 +
+let's have look at the code:
++
+Local Execution Environment
++
+[source,java]
+----
+// get iot stream from kafka - topic "iot"
+    DataStream<String> iotStream = env.addSource(
+        new FlinkKafkaConsumer<>("iot", new SimpleStringSchema(), properties));
+----
++
+Collection Data Sources
++
+[source,java]
+----
+// split and sum on 'sensor_id'
+    DataStream<Tuple5<Long, Integer, Integer, Integer, Integer>> aggStream = iotStream
+     .flatMap(new trxJSONDeserializer())
+     .keyBy(1)
+     .window(TumblingProcessingTimeWindows.of(Time.seconds(10)))
+     .sum(4) ;
+----
++
+Iterator Data Sink
++
+----
+// write the aggregated data stream to a Kafka sink
+    aggStream.addSink(new FlinkKafkaProducer<>(
+     Commons.EXAMPLE_KAFKA_SERVER,
+     "simulation_sum",
+     new serializeSum2String()));
+----
++
 .. use the first SSH connection to run the Flink application
 +
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/FLINK
 $ sudo wget https://github.com/zBrainiac/edge2ailab/releases/download/0.2.0/edge2ailab-0.2.0-jar-with-dependencies.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
-$ ./bin/flink run -m yarn-cluster -c FlinkConsumer.iotConsumer -ynm myFistFlinkApp lib/flink/examples/streaming/edge2ailab-0.2.0-jar-with-dependencies.jar
+$ ./bin/flink run -m yarn-cluster -c FlinkConsumer.iotConsumer -ynm myFirstFlinkApp lib/flink/examples/streaming/edge2ailab-0.2.0-jar-with-dependencies.jar
 ----
++
+. Let's see how the application works
 +
 .. use the second SSH connection to see the result
 +

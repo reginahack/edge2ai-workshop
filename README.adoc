@@ -83,8 +83,8 @@ Pick your lab and let's get started!
 
 * link:streaming.adoc[From Edge to Streams Processing]
 * link:spark_analytics.adoc[Spark and Fast Analytics with Kudu]
-* link:streaming_lite.adoc.adoc[From mqtt to Streams Processing]
-* link:streaming_flink.adoc.adoc.adoc[Streams Processing with Flink]
+* link:streaming_lite.adoc[From mqtt to Streams Processing]
+* link:streaming_flink.adoc[Streams Processing with Flink]
 * link:datascience.adoc[CDSW Experiments and Models]
 
 == Resources

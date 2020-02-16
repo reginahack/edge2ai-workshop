@@ -471,7 +471,7 @@ image::images/table_select_lite.png[width=800]
 +
 .. *Dataflow:*
 +
-image::images/iot_streamingIntro_lite.png[width=800]
+image::images/iot_streamingFlinkDataflowCount.png[width=800]
 +
 .. Open two SSH connections to your environment
 +

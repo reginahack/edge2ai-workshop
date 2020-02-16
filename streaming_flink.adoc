@@ -1,6 +1,6 @@
-= From Edge to Streams Processing
+= Streams Processing with Apache Flink
 
-In this workshop you'll implement a data pipeline, using NiFi to ingest data from an IoT device into Kafka and then consume data from Kafka and write it to Kudu tables.
+In this workshop is build on top of the "edge2AI Workshop" (pre-condition) and add enhanced features in stream processing.
 
 == Labs summary
 

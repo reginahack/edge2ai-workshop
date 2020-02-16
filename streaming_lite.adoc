@@ -13,7 +13,7 @@ In this workshop you'll implement a data pipeline, using NiFi to ingest data fro
 * *Lab 7* - Apache Flink- your friend for streaming use cases
 
 [[lab_1, Lab 1]]
-== Lab 1 - Apache NiFi: setup machine sensors simulator 
+== Lab 1 - Apache NiFi: setup machine sensors simulator
 
 In this lab you will run a simple Python script that simulates IoT sensor data from some hypothetical machines, and send the data to a MQTT broker (link:https://mosquitto.org/[mosquitto]). The gateway host is connected to many and different type of sensors, but they generally all share the same transport protocol, "mqtt".
 

@@ -39,7 +39,7 @@ Collection Data Sources
 // split and sum on 'sensor_id'
     DataStream<Tuple5<Long, Integer, Integer, Integer, Integer>> aggStream = iotStream
      .flatMap(new trxJSONDeserializer())
-     .keyBy(1)
+     .keyBy(1) // = sensor_id
      .window(TumblingProcessingTimeWindows.of(Time.seconds(10)))
      .sum(4) ;
 ----
@@ -48,10 +48,10 @@ Iterator Data Sink
 +
 ----
 // write the aggregated data stream to a Kafka sink
-    aggStream.addSink(new FlinkKafkaProducer<>(
-     Commons.EXAMPLE_KAFKA_SERVER,
-     "simulation_sum",
-     new serializeSum2String()));
+        FlinkKafkaProducer<Tuple5<Long, Integer, Integer, Integer, Integer>> myProducer = new FlinkKafkaProducer<Tuple5<Long, Integer, Integer, Integer, Integer>>(
+                topic, new serializeSum2String(), propertiesProducer);
+
+        aggStream.addSink(myProducer);
 ----
 +
 . Let's run the application
@@ -62,8 +62,8 @@ use the first SSH connection to run the Flink application
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/FLINK
-$ sudo wget https://github.com/zBrainiac/edge2ailab/releases/download/0.2.1/edge2ailab-0.2.1-jar-with-dependencies.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
-$ ./bin/flink run -m yarn-cluster -c FlinkConsumer.iotConsumer -ynm myFirstFlinkApp lib/flink/examples/streaming/edge2ailab-0.2.1-jar-with-dependencies.jar
+$ sudo wget https://github.com/zBrainiac/Streaming/releases/download/0.4.0/streaming-0.4.0-jar-with-dependencies.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
+$ ./bin/flink run -m yarn-cluster -c flinkConsumer.iotConsumerCount -ynm iotConsumerCount lib/flink/examples/streaming/streaming-0.4.0-jar-with-dependencies.jar
 ----
 +
 . Let's see how the application works
@@ -73,7 +73,7 @@ $ ./bin/flink run -m yarn-cluster -c FlinkConsumer.iotConsumer -ynm myFirstFlink
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/CDH
-$ ./bin/kafka-console-consumer --bootstrap-server edge2ai-1.dim.local:9092 --topic simulation_sum
+$ ./bin/kafka-console-consumer --bootstrap-server edge2ai-1.dim.local:9092 --topic result_iot_Consumer_Count
 ----
 +
 SSH connection
@@ -111,16 +111,16 @@ Collection Data Sources
 [source,java]
 ----
 // split on 'sensor_id' & filter on sensor_0
-    DataStream<Tuple5<Long, Integer, Integer, Integer, Integer>> aggStream = iotStream
-       .flatMap(new trxJSONDeserializer())
-       .keyBy(1) // sensor_id
-       .sum(4)
-       .filter(new FilterFunction<Tuple5<Long, Integer, Integer, Integer, Integer>>() {
-          @Override
+DataStream<Tuple5<Long, Integer, Integer, Integer, Integer>> aggStream = iotStream
+   .flatMap(new trxJSONDeserializer())
+   .keyBy(1) // sensor_id
+   .sum(4)
+   .filter(new FilterFunction<Tuple5<Long, Integer, Integer, Integer, Integer>>()
+       @Override
           public boolean filter(Tuple5<Long, Integer, Integer, Integer, Integer> value) throws Exception {
-             return value.f2 >= 50 ; // sensor_0
+               return value.f2 >= 50 ;
           }
-       });
+  });
 ----
 +
 . Let's run the application
@@ -130,7 +130,7 @@ use the new SSH connection to run the Flink application
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/FLINK
-$ ./bin/flink run -m yarn-cluster -c FlinkConsumer.iotConsumerFilter -ynm myFlinkAppFilter lib/flink/examples/streaming/edge2ailab-0.2.1-jar-with-dependencies.jar
+$ ./bin/flink run -m yarn-cluster -c flinkConsumer.iotConsumerCount -ynm iotConsumerCount lib/flink/examples/streaming/streaming-0.4.0-jar-with-dependencies.jar
 ----
 +
 . Let's see how the application works
@@ -140,5 +140,5 @@ $ ./bin/flink run -m yarn-cluster -c FlinkConsumer.iotConsumerFilter -ynm myFlin
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/CDH
-$ ./bin/kafka-console-consumer --bootstrap-server edge2ai-1.dim.local:9092 --topic iot_filter
+$ ./bin/kafka-console-consumer --bootstrap-server edge2ai-1.dim.local:9092 --topic result_iot_Consumer_Filter
 ----

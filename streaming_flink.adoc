@@ -130,7 +130,7 @@ use the new SSH connection to run the Flink application
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/FLINK
-$ ./bin/flink run -m yarn-cluster -c flinkConsumer.iotConsumerCount -ynm iotConsumerCount lib/flink/examples/streaming/streaming-0.4.0-jar-with-dependencies.jar
+$ ./bin/flink run -m yarn-cluster -c flinkConsumer.iotConsumerFilter -ynm iotConsumerCount lib/flink/examples/streaming/streaming-0.4.0-jar-with-dependencies.jar
 ----
 +
 . Let's see how the application works

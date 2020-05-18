@@ -15,7 +15,7 @@ In this workshop you'll implement a data pipeline, using NiFi to ingest data fro
 [[lab_1, Lab 1]]
 == Lab 1 - Apache NiFi: setup machine sensors simulator
 
-In this lab you will run a simple Python script that simulates IoT sensor data from some hypothetical machines, and send the data to a MQTT broker (link:https://mosquitto.org/[mosquitto]). The gateway host is connected to many and different type of sensors, but they generally all share the same transport protocol, "mqtt".
+predictionIn this lab you will run a simple Python script that simulates IoT sensor data from some hypothetical machines, and send the data to a MQTT broker (link:https://mosquitto.org/[mosquitto]). The gateway host is connected to many and different type of sensors, but they generally all share the same transport protocol, "mqtt".
 
 . Go to Apache NiFi and add a Processor (ExecuteProcess) to the canvas.
 +
@@ -327,7 +327,7 @@ image::images/additional_controller_services_lite.png[width=800]
 
 === Create the flow
 
-We'll now create the flow to read the sensor data from Kafka, execute a model prediction for each of them and write the results to Kudu. At the end of this section you flow should look like the one below:
+We'll now create the flow to read the sensor data from Kafka and write the results to Kudu. At the end of this section you flow should look like the one below:
 
 image::images/from_kafka_to_kudu_flow_lite.png[width=800]
 

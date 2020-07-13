@@ -91,7 +91,6 @@ Flink UI provide more details and monitoring of the job's
 +
 image::images/FLINK_running_jobs_lite.png[width=800]
 
-
 [[lab_2, Lab 2]]
 == Lab 2 - Filtering on sensor_0 value
 . Let’s use the #iot stream form the sensors from the previous lab

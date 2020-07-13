@@ -87,9 +87,9 @@ image::images/SMM_topic_simulation_sum.png[width=800]
 +
 .. YARN & FLINK UI view:
 +
-Flink UI provide more details and monitoring of the job
+Flink UI provide more details and monitoring of the job's
 +
-image::images/FLINk_running_jobs-lite.png[width=800]
+image::images/FLINk_running_jobs_lite.png[width=800]
 
 
 [[lab_2, Lab 2]]

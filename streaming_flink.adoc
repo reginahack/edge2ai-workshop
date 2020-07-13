@@ -89,7 +89,7 @@ image::images/SMM_topic_simulation_sum.png[width=800]
 +
 Flink UI provide more details and monitoring of the job's
 +
-image::images/FLINk_running_jobs_lite.png[width=800]
+image::images/FLINK_running_jobs_lite.png[width=800]
 
 
 [[lab_2, Lab 2]]

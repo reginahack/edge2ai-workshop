@@ -62,8 +62,9 @@ use the first SSH connection to run the Flink application
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/FLINK
-$ sudo wget https://github.com/zBrainiac/Streaming/releases/download/0.4.0/streaming-0.4.0-jar-with-dependencies.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
-$ ./bin/flink run -m yarn-cluster -c flinkConsumer.iotConsumerCount -ynm iotConsumerCount lib/flink/examples/streaming/streaming-0.4.0-jar-with-dependencies.jar
+$ sudo wget https://github.com/zBrainiac/streaming-flink/releases/download/0.1.0/streaming-flink-0.1-SNAPSHOT.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
+$ ./bin/flink run -m yarn-cluster -c consumer.IoTConsumerCount -ynm IoTConsumerCount lib/flink/examples/streaming/streaming-flink-0.1-SNAPSHOT.jar edge2ai-1.dim.local:9092
+
 ----
 +
 . Let's see how the application works
@@ -86,17 +87,9 @@ image::images/SMM_topic_simulation_sum.png[width=800]
 +
 .. YARN & FLINK UI view:
 +
-goto Cloudera Manager > YARN > Applications
-+
-image::images/YARN_Application.png[width=800]
-+
-see details of the running Flink job and use the <Tracking URL>
-+
-image::images/YARN_Application_details.png[width=800]
-+
 Flink UI provide more details and monitoring of the job
 +
-image::images/FLINk_running_jobs.png[width=800]
+image::images/FLINk_running_jobs-lite.png[width=800]
 
 
 [[lab_2, Lab 2]]
@@ -130,7 +123,7 @@ use the new SSH connection to run the Flink application
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/FLINK
-$ ./bin/flink run -m yarn-cluster -c flinkConsumer.iotConsumerFilter -ynm iotConsumerFilter lib/flink/examples/streaming/streaming-0.4.0-jar-with-dependencies.jar
+$ ./bin/flink run -m yarn-cluster -c consumer.IoTConsumerFilter -ynm IoTConsumerFilter lib/flink/examples/streaming/streaming-flink-0.1-SNAPSHOT.jar edge2ai-1.dim.local:9092
 ----
 +
 . Let's see how the application works

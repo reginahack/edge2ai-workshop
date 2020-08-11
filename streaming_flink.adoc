@@ -62,7 +62,7 @@ use the first SSH connection to run the Flink application
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/FLINK
-$ sudo wget https://github.com/zBrainiac/streaming-flink/releases/download/0.1.0/streaming-flink-0.1-SNAPSHOT.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
+$ sudo wget https://github.com/zBrainiac/streaming-flink/releases/download/0.1.5/streaming-flink-0.1-SNAPSHOT.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
 $ ./bin/flink run -m yarn-cluster -c consumer.IoTConsumerCount -ynm IoTConsumerCount lib/flink/examples/streaming/streaming-flink-0.1-SNAPSHOT.jar edge2ai-1.dim.local:9092
 
 ----

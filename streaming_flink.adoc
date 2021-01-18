@@ -62,8 +62,8 @@ use the first SSH connection to run the Flink application
 [source,shell]
 ----
 cd /opt/cloudera/parcels/FLINK
-sudo wget https://github.com/zBrainiac/streaming-flink/releases/download/0.3.0/streaming-flink-0.3.0.1.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
-./bin/flink run -m yarn-cluster -c consumer.IoTConsumerCount -ynm IoTConsumerCount lib/flink/examples/streaming/streaming-flink-0.3.0.1.jar edge2ai-1.dim.local:9092
+sudo wget https://github.com/zBrainiac/streaming-flink/releases/download/0.3.0/streaming-flink-0.3.1.0.jar -P /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
+./bin/flink run -m yarn-cluster -c consumer.IoTUC1CountEventsPerSensorId -ynm IoTUC1CountEventsPerSensorId lib/flink/examples/streaming/streaming-flink-0.3.1.0.jar edge2ai-1.dim.local:9092
 ----
 +
 . Let's see how the application works
@@ -121,7 +121,7 @@ use the new SSH connection to run the Flink application
 [source,shell]
 ----
 cd /opt/cloudera/parcels/FLINK
-./bin/flink run -m yarn-cluster -c consumer.IoTConsumerFilter -ynm IoTConsumerFilter lib/flink/examples/streaming/streaming-flink-0.3.0.1.jar edge2ai-1.dim.local:9092
+./bin/flink run -m yarn-cluster -c consumer.IoTUC2CountEventsPerSensorIdFilter -ynm IoTUC2CountEventsPerSensorIdFilter lib/flink/examples/streaming/streaming-flink-0.3.1.0.jar edge2ai-1.dim.local:9092
 ----
 +
 . Let's see how the application works

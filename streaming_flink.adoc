@@ -73,7 +73,7 @@ sudo wget https://github.com/zBrainiac/streaming-flink/releases/download/0.3.1/s
 [source,shell]
 ----
 $ cd /opt/cloudera/parcels/CDH
-$ ./bin/kafka-console-consumer --bootstrap-server edge2ai-1.dim.local:9092 --topic result_iot_Consumer_Count
+$ ./bin/kafka-console-consumer --bootstrap-server edge2ai-1.dim.local:9092 --topic result_iot_uc1_Count_EventsPerSensorId
 ----
 +
 SSH connection

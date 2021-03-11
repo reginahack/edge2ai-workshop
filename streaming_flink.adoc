@@ -4,12 +4,12 @@ In this workshop is build on top of the "edge2AI Workshop" (pre-condition) and a
 
 == Labs summary
 
-* *Lab 1* - Count by sensor_id
-* *Lab 2* - Filtering on sensor_0 value
+* *Sample 1* - Count by sensor_id
+* *Sample 2* - Filtering on sensor_0 value
 
 
-[[lab_1, Lab 1]]
-== Lab 1 - Apache Flink - Count by sensor_id
+[[Sample_1, Sample 1]]
+== Sample 1 - Apache Flink - Count by sensor_id
 
 . Let's use the #iot stream form the sensors from the previous lab
 +
@@ -90,8 +90,8 @@ Flink UI provide more details and monitoring of the job's
 +
 image::images/FLINK_running_jobs_lite.png[width=800]
 
-[[lab_2, Lab 2]]
-== Lab 2 - Filtering on sensor_0 value
+[[Sample_2, Sample 2]]
+== Sample 2 - Filtering on sensor_0 value
 . Let’s use the #iot stream form the sensors from the previous lab
 +
 .. *Dataflow:*

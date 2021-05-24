@@ -466,4 +466,4 @@ image::images/table_select_lite.png[width=800]
 
 [[lab_7, Lab 7]]
 == Lab 7 - Apache Flink- your friend for streaming use cases
-* click here for the next Lab: link:streaming_flink.adoc[Streams Processing with Flink]
+* click here for the next Lab: link:sql_stream_builder_lite.adoc[SQL Stream Builder (based on Apache  Flink)]

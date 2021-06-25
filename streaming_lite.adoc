@@ -136,7 +136,6 @@ image::images/added_hwx_sr_service.png[width=800]
 [source]
 ----
 Schema Access Strategy: Use 'Schema Name' Property
-Schema Registry:        HortonworksSchemaRegistry
 Schema Name:            ${schema.name} -> already set by default!
 ----
 
@@ -145,9 +144,12 @@ Schema Name:            ${schema.name} -> already set by default!
 [source]
 ----
 Schema Write Strategy:  HWX Schema Reference Attributes
-Schema Access Strategy: Inherit Record Schema
 Schema Registry:        HortonworksSchemaRegistry
 ----
++
+_JsonRecordSetWriter_ definition:
++
+image::images/set_recordwriter.png[width=800]
 
 . Enable the *JsonTreeReader* and the *JsonRecordSetWriter* Controller Services you just created, by clicking on their respective _lightning bolt_ icons (image:images/enable_icon.png[width=20]).
 +
@@ -193,6 +195,11 @@ Name: Set Schema Name
 Property Name:  schema.name
 Property Value: SensorReading
 ----
++
+Add _schema.name_ property:
++
+image::images/set_schemaName.png[width=800]
+
 .. Click *Apply*
 
 . Connect the *Consume mqtt* input port to the *Set Schema Name* processor.
@@ -227,6 +234,10 @@ NOTE: Make sure you use the PublishKafkaRecord_2.0 processor and *not* the Publi
 Property Name:  client.id
 Property Value: nifi-sensor-data
 ----
++
+Add _schema.name_ property:
++
+image::images/set_kafkaproducer_clientid.png[width=800]
 +
 Later, this will help us clearly identify who is producing data into the Kafka topic.
 

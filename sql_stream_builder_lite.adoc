@@ -6,10 +6,10 @@ In this workshop you will use SQL Stream Builder to query and manipulate data st
 
 == Labs summary
 
-* *Lab 1* - Create a Data Source
-* *Lab 2* - Create a Source Virtual Table for a topic with JSON messages
-* *Lab 3* - Run a simple query
-* *Lab 4* - Computing and storing aggregation results
+* *Step 1* - Create a Data Source
+* *Step 2* - Create a Source Virtual Table for a topic with JSON messages
+* *Step 3* - Run a simple query
+* *Step 4* - Computing and storing aggregation results
 
 == Introduction
 
@@ -30,7 +30,7 @@ Before we can start querying data from Kafka topics we need to register the Kafk
 
 . On the logon screen, authenticate with user `admin` and password `supersecret1`.
 
-. Click on *Data Sources* you will notice that SSB already has a Kafka cluster registered as a data source, named `CDP Kafka`. This source is created automatically for SSB when it is installed on a cluster that also has a Kafka service:
+. Click on *Data Providers* you will notice that SSB already has a Kafka cluster registered as a data source, named `CDP Kafka`. This source is created automatically for SSB when it is installed on a cluster that also has a Kafka service:
 +
 image::images/ssb-register-kafka-provider.png[width=800]
 
@@ -62,6 +62,21 @@ image::images/ssb-kafka-source.png[width=400]
 . Ensure the *Schema* tab is selected. Scroll to the bottom of the tab and click *Detect Schema*. SSB will take a sample of the data flowing through the topic and will infer the schema used to parse the content. Alternatively you could also specify the schema in this tab.
 +
 image::images/ssb-detect-schema.png[width=400]
+
+. Click on the *Event Time* tab, define your time handling. You can specify Watermark Definitions when adding a Kafka table. Watermarks use an event time attribute and have a watermark strategy, and can be used for various time-based operations. The *Event Time* tab provides the following properties to configure the event time field and watermark for the Kafka stream:
+
+* *Input Timestamp* Column: name of the timestamp column in the Kafka table from where the event time column is mapped
+* *Event Time* Column: new name of the timestamp column where the watermarks are going to be mapped
+* *Watermark seconds* : number of seconds used in the watermark strategy. The watermark is defined by the current event timestamp minus this value.
++
+[source,yaml]
+----
+Input Timestamp Column: sensor_ts
+Event Time Column:      event_ts
+Watermark Seconds:      3
+----
++
+image::images/ssb-define-timehandling.png[width=800]
 
 . Click on the *Properties* tab, enter the following value for the *Consumer Group* property and click *Save changes*.
 +
@@ -126,7 +141,7 @@ Streams Messaging Manager Web UI*).
 ... Availability: `Low`
 ... Cleanup Policy: `delete`
 
-. To create the Sink Virtual Table, click on *Console* (on the left bar) *> Virtual Tables > Sink Virtual Table > Add Source > Apache Kafka*.
+. To create the Sink Virtual Table, click on *Console* (on the left bar) *> Tables > Add Table > Apache Kafka*.
 +
 image::images/ssb-add-sink-virtual-table.png[width=800]
 
@@ -137,6 +152,7 @@ image::images/ssb-add-sink-virtual-table.png[width=800]
 Virtual table name: sensor6_stats_sink
 Kafka Cluster:      CDP Kafka
 Topic Name:         sensor6_stats
+Dynamic Schema:     YES
 ----
 +
 image::images/ssb-kafka-sink.png[width=400]
@@ -157,7 +173,7 @@ This query will compute aggregates over 30-seconds windows that slide forward ev
 ----
 SELECT
   sensor_id as device_id,
-  HOP_END(sensor_ts, INTERVAL '1' SECOND, INTERVAL '30' SECOND) as windowEnd,
+  HOP_END(event_ts, INTERVAL '1' SECOND, INTERVAL '30' SECOND) as windowEnd,
   count(*) as sensorCount,
   sum(sensor_6) as sensorSum,
   avg(cast(sensor_6 as float)) as sensorAverage,
@@ -167,7 +183,7 @@ SELECT
 FROM iot_enriched_source
 GROUP BY
   sensor_id,
-  HOP(sensor_ts, INTERVAL '1' SECOND, INTERVAL '30' SECOND)
+  HOP(event_ts, INTERVAL '1' SECOND, INTERVAL '30' SECOND)
 ----
 +
 image::images/ssb-sql-aggregation.png[width=800]

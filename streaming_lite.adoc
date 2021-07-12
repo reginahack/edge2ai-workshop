@@ -136,6 +136,7 @@ image::images/added_hwx_sr_service.png[width=800]
 [source]
 ----
 Schema Access Strategy: Use 'Schema Name' Property
+Schema Registry:        HortonworksSchemaRegistry
 Schema Name:            ${schema.name} -> already set by default!
 ----
 

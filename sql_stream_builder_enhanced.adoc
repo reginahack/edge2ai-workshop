@@ -499,7 +499,8 @@ image::images/ssb-mv-addQuery.png[width=400]
 == Lab 9 - Perform an HTTP action
 You can configure the *webhook table* to perform an HTTP action per message (default) or to create code that controls the frequency (for instance, every N messages).
 
-. Create a new http endpoint: https://hookbin.com
+WARNING: Open new browser in _incognito mode_ and create a new http endpoint at https://webhook.site
+
 . Select Console from the main menu.
 . Select the Tables tab.
 . Select Add table > Webhook. The *Webhook Table* window appears.
@@ -508,13 +509,12 @@ You can configure the *webhook table* to perform an HTTP action per message (def
 [source,shell]
 ----
 Table name              webhook_table
-Http EndPoint           hookbin endpoint https://
+Http EndPoint           webhook endpoint https://
 HttpMethod              POST
-Disable SSL Validation  No
-Enable Request Template No
+Disable SSL Validation  no
+Enable Request Template yes
 ----
 +
-
 . In the *Code editor*, you can specify a code block that controls how the webhook displays the data.
 For a webhook that is called for each message the following code is used:
 +
@@ -532,7 +532,6 @@ onCondition($p0)
 . Add HTTP headers using the HTTP Headers tab, if needed.
 +
 image::images/ssb-webhooktable-httpheader.png[width=600]
-
 +
 [source,shell]
 ----
@@ -541,20 +540,37 @@ Value           application/json
 ----
 +
 . Press the *plus* sign to save
+. On the *Request Template* tab modify template
++
+image::images/ssb-webhooktable-requesttemplate.png[width=600]
++
+[source,javascript]
+----
+{
+   "incident":{
+      "type":"incident",
+      "title":"${sensor_id} - pressure is too high!",
+        "body":{
+   "type":"incident_body",
+         "details":"Sensor with id ${sensor_id} has ${sensor_0} pascal."
+      }
+    }
+}
+----
 . Click *Save changes*
 . On the *Console* *> Compose > SQL* and type the following query:
 +
 [source,sql]
 ----
-select *
+select sensor_id, sensor_0
 from iot_enriched_source
-where sensor_0 >= 5000
+where sensor_0 >= 8000
 ----
 +
 image::images/ssb-webhook-sql.png[width=600]
 +
 . Click *Execute*
-. Back on the https://hookbin.com/ page you will see the submitted messages
+. Back on the https://webhook.site page you will see the submitted messages
 +
 image::images/ssb-webhook-result.png[width=600]
 

@@ -14,6 +14,7 @@ In this workshop you will use SQL Stream Builder to query and manipulate data st
 * *Lab 6* - Join two Kafka topics
 * *Lab 7* - Look up Reference data stored in Kudu
 * *Lab 8* - Materialized Views
+* *Lab 9* - Perform an HTTP action
 
 
 == Introduction
@@ -42,12 +43,12 @@ sudo wget https://github.com/zBrainiac/streaming-flink/releases/download/0.4.1/s
 
 . Switch directory and start JAVA App - parameters:
 .. kafka-broker = edge2ai-1.dim.local:9092
-.. 100 ms wait time between msg.
+.. 1000 ms wait time between msg.
 +
 [source,shell]
 ----
 cd /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
-java -classpath streaming-flink-0.4.1.0.jar producer.KafkaIOTSensorSimulator edge2ai-1.dim.local:9092 100
+java -classpath streaming-flink-0.4.1.0.jar producer.KafkaIOTSensorSimulator edge2ai-1.dim.local:9092 1000
 ----
 
 [[lab_1, Lab 1]]
@@ -184,7 +185,7 @@ group by sensor_id
 . After editing SQL - click on *Restart*
 +
 
-NOTE: Make sure to stop your queries to release all resources once you finish this lab. You can double-check that all queries/jobs have been stopped by clicking on the *SQL Jobs* tab. If any jobs are still running, you can stop them from that page.
+WARNING: Make sure to stop your queries to release all resources once you finish this lab. You can double-check that all queries/jobs have been stopped by clicking on the *SQL Jobs* tab. If any jobs are still running, you can stop them from that page.
 
 [[lab_4, Lab 4]]
 == Lab 4 - Computing and storing aggregation results
@@ -318,7 +319,7 @@ image::images/ssb-stats-results.png[width=800]
 +
 image::images/ssb-jobs-running.png[width=800]
 
-NOTE: Make sure to stop your queries to release all resources once you finish this lab. You can double-check that all queries/jobs have been stopped by clicking on the *SQL Jobs* tab. If any jobs are still running, you can stop them from that page.
+WARNING: Make sure to stop your queries to release all resources once you finish this lab. You can double-check that all queries/jobs have been stopped by clicking on the *SQL Jobs* tab. If any jobs are still running, you can stop them from that page.
 
 
 [[lab_5, Lab 5]]
@@ -407,7 +408,7 @@ inner join weather_condition as weather
 on iot.sensor_id = weather.stationid
 ----
 
-NOTE: Make sure to stop your queries to release all resources once you finish this lab. You can double-check that all queries/jobs have been stopped by clicking on the *SQL Jobs* tab. If any jobs are still running, you can stop them from that page.
+WARNING: Make sure to stop your queries to release all resources once you finish this lab. You can double-check that all queries/jobs have been stopped by clicking on the *SQL Jobs* tab. If any jobs are still running, you can stop them from that page.
 
 
 [[lab_7, Lab 7]]
@@ -422,7 +423,7 @@ image::images/impala_editor.png[width=800]
 
 . Copy & past the following DDL which creates some tables and insert some reference data into it:
 +
-NOTE: See link:data/RefData_geolocation.sql[Create SQL Statement]
+WARNING: See link:data/RefData_geolocation.sql[Create SQL Statement]
 
 +
 image::images/create_table.png[width=800]
@@ -493,6 +494,70 @@ image::images/ssb-mv-addQuery.png[width=400]
 +
 .. REST endpoint is exposed as: <URI>/api/v1/query/<job id>/sensorid/*{sensor_id}*?key=<API Key>
 .. invoke it with: sample /api/v1/query/5195/sensorid/*12*?key=AbzRvs....
+
+[[lab_9, Lab 9]]
+== Lab 9 - Perform an HTTP action
+You can configure the *webhook table* to perform an HTTP action per message (default) or to create code that controls the frequency (for instance, every N messages).
+
+. Create a new http endpoint: https://hookbin.com
+. Select Console from the main menu.
+. Select the Tables tab.
+. Select Add table > Webhook. The *Webhook Table* window appears.
++
+
+[source,shell]
+----
+Table name              webhook_table
+Http EndPoint           hookbin endpoint https://
+HttpMethod              POST
+Disable SSL Validation  No
+Enable Request Template No
+----
++
+
+. In the *Code editor*, you can specify a code block that controls how the webhook displays the data.
+For a webhook that is called for each message the following code is used:
++
+image::images/ssb-webhooktable-code.png[width=600]
++
+[source,javascript]
+----
+// Boolean function that takes entire row from query as Json Object
+function onCondition(rowAsJson)
+{return true;   // return false here for no-op, or plug in custom
+        logic}
+onCondition($p0)
+----
++
+. Add HTTP headers using the HTTP Headers tab, if needed.
++
+image::images/ssb-webhooktable-httpheader.png[width=600]
+
++
+[source,shell]
+----
+Http Header     Content-Type
+Value           application/json
+----
++
+. Press the *plus* sign to save
+. Click *Save changes*
+. On the *Console* *> Compose > SQL* and type the following query:
++
+[source,sql]
+----
+select *
+from iot_enriched_source
+where sensor_0 >= 5000
+----
++
+image::images/ssb-webhook-sql.png[width=600]
++
+. Click *Execute*
+. Back on the https://hookbin.com/ page you will see the submitted messages
++
+image::images/ssb-webhook-result.png[width=600]
+
 
 == End of the _Streaming SQL_ Lab's (for today)
 

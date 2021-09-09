@@ -54,7 +54,7 @@ Sample command looks like:
 [source,shell]
 ----
 cd /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming &&
-java -classpath streaming-flink-0.4.1.0.jar producer.KafkaIOTSensorSimulator edge2ai-1.dim.local:9092 1000
+java -classpath kafka-producer-0.0.1.0.jar producer.KafkaIOTSensorSimulator edge2ai-1.dim.local:9092 1000
 ----
 
 [[lab_1, Lab 1]]

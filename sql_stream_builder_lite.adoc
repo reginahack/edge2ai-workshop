@@ -20,7 +20,7 @@ So let's start with a straightforward goal: to query the contents of the `iot` t
 Albeit simple, this task will show the ease of use and power of SQL Stream Builder (SSB).
 
 [[lab_1, Lab 1]]
-== Lab 1 - Create a Data Source
+== Lab 1 - Create a Data Source for IoT Topic
 
 Before we can start querying data from Kafka topics we need to register the Kafka clusters as _data sources_ in SSB.
 
@@ -28,7 +28,7 @@ Before we can start querying data from Kafka topics we need to register the Kafk
 
 . Click on the *SQLStreamBuilder Console* link to open the SSB UI.
 
-. On the logon screen, authenticate with user `admin` and password `supersecret1`.
+. On the logon screen, authenticate with user `admin` and password `supersecret1`
 
 . Click on *Data Providers* you will notice that SSB already has a Kafka cluster registered as a data source, named `CDP Kafka`. This source is created automatically for SSB when it is installed on a cluster that also has a Kafka service:
 +
@@ -39,11 +39,11 @@ image::images/ssb-register-kafka-provider.png[width=800]
 [[lab_2, Lab 2]]
 == Lab 2 - Create a Source Virtual Table for a topic with JSON messages
 
-Now we can _map_ the `iot` topic to a _virtual table_ that we can reference in our query. _Virtual Tables_ on SSB are a way to associate a Kafka topic with a schema so that we can use that as a table in our queries. There are two types of virtual tables in SSB: _Source_ and _Sink_.
+Now we can _map_ the `iot` topic to a _virtual table_ that we can reference in our query. _Virtual Tables_ on SSB are a way to associate a Kafka topic with a schema so that we can use that as a table in our queries.
 
 We will use a Source Virtual Table now to read from the topic. Later we will look into Sink Virtual Tables to write data to Kafka.
 
-. To create our first Source Virtual Table, click on *Console* (on the left bar) *> Virtual Tables > Source Virtual Table > Add Source > Apache Kafka*.
+. To create our first Source Virtual Table, click on *Console* (on the left bar) *> Tables > Add table > Apache Kafka*.
 +
 image::images/ssb-add-source-virtual-table.png[width=800]
 
@@ -61,11 +61,13 @@ image::images/ssb-kafka-source.png[width=400]
 
 . Ensure the *Schema* tab is selected. Scroll to the bottom of the tab and click *Detect Schema*. SSB will take a sample of the data flowing through the topic and will infer the schema used to parse the content. Alternatively you could also specify the schema in this tab.
 +
+
 image::images/ssb-detect-schema.png[width=400]
+. Click on the *Event Time* tab, define your time handling. You can specify Watermark Definitions when adding a Kafka table. Watermarks use an event time attribute and have a watermark strategy, and can be used for various time-based operations.
++
+The *Event Time* tab provides the following properties to configure the event time field and watermark for the Kafka stream:
 
-. Click on the *Event Time* tab, define your time handling. You can specify Watermark Definitions when adding a Kafka table. Watermarks use an event time attribute and have a watermark strategy, and can be used for various time-based operations. The *Event Time* tab provides the following properties to configure the event time field and watermark for the Kafka stream:
-
-* *Input Timestamp* Column: name of the timestamp column in the Kafka table from where the event time column is mapped
+* *Input Timestamp* Column: name of the timestamp column in the Kafka table from where the event time column is mapped. If you wanna use a colume from the event message you have to unselect the box _Use Kafka Timestamp_ first.
 * *Event Time* Column: new name of the timestamp column where the watermarks are going to be mapped
 * *Watermark seconds* : number of seconds used in the watermark strategy. The watermark is defined by the current event timestamp minus this value.
 +
@@ -76,14 +78,31 @@ Event Time Column:      event_ts
 Watermark Seconds:      3
 ----
 +
-image::images/ssb-define-timehandling.png[width=800]
-
+image::images/ssb-define-timehandling.png[width=400]
+. If we need to manipulate the source data to fix, cleanse or convert some values, we can define *transformations* for the data source to perform those changes. These transformations are defined in Javascript.
++
+The serialized record read from Kafka is provided to the Javascript code in the `record.value` variable. The last command of the transformation must return the serialized content of the modified record.
++
+The `sensor_0` data in the `iot` topic has a pressure expressed in micro-pascal. Let's say we need the value in pascal scale. Let's write a transformation to perform that conversion for us at the source.
++
+Click on the *Transformations* tab and enter the following code in the *Code* field:
++
+[source,javascript]
+----
+// Kafka payload (record value JSON deserialized to JavaScript object)
+var payload = JSON.parse(record.value);
+payload['sensor_0'] = Math.round(payload.sensor_0 * 1000);
+JSON.stringify(payload);
+----
++
+image::images/ssb-source-transformations.png[width=400]
 . Click on the *Properties* tab, enter the following value for the *Consumer Group* property and click *Save changes*.
 +
 [source,yaml]
 ----
 Consumer Group: ssb-iot-1
 ----
+
 +
 image::images/ssb-source-properties.png[width=400]
 +
@@ -118,12 +137,25 @@ image::images/ssb-sql-execution.png[width=800]
 
 . After a few seconds the SQL Console will start showing the results of the query coming from the `iot` topic.
 +
-The data displayed on the screen is only a sample of the data returned by the query, not the full data.
+The data displayed on the screen is only a sample of the data returned by the query, not the full data. The column on the right shows the previously defined *Event Time*
 +
 image::images/ssb-sql-results.png[width=800]
 +
+. Well done! Let's increase the level of difficulty and replace the existing SQL with the  *HELLO WORLD in streaming* and counting the events by *sensor_id* - standard SQL with *GROUP BY* and *COUNT*.
 
-. Make sure to stop your queries to release all resources once you finish this lab. You can double-check that all queries/jobs have been stopped by clicking on the *SQL Jobs* tab. If any jobs are still running, you can stop them from that page.
++
+[source,sql]
+----
+select sensor_id,
+  count(*) as sensorCount
+from iot_enriched_source
+group by sensor_id
+----
++
+. After editing SQL - click on *Restart*
++
+
+WARNING: Make sure to stop your queries to release all resources once you finish this lab. You can double-check that all queries/jobs have been stopped by clicking on the *SQL Jobs* tab. If any jobs are still running, you can stop them from that page.
 
 [[lab_4, Lab 4]]
 == Lab 4 - Computing and storing aggregation results
@@ -141,11 +173,11 @@ Streams Messaging Manager Web UI*).
 ... Availability: `Low`
 ... Cleanup Policy: `delete`
 
-. To create the Sink Virtual Table, click on *Console* (on the left bar) *> Tables > Add Table > Apache Kafka*.
+. Back in SSB to create the Sink Table, click on *Console* (on the left bar) *> Tables > Add Table > Apache Kafka*.
 +
-image::images/ssb-add-sink-virtual-table.png[width=800]
+image::images/ssb-add-source-virtual-table.png[width=800]
 
-. On the *Kafka Sink* window, enter the following information and click *Save changes*:
+. On the *Apache Kafka* window, enter the following information and click *Save changes*:
 +
 [source,yaml]
 ----
@@ -220,10 +252,10 @@ image::images/ssb-job-details.png[width=800]
 +
 image::images/ssb-job-dashboard.png[width=800]
 
-. Let's query the `sensor6_stats` table to examine the data that is being written to it. First we need to define a Source Virtual Table associated with the `sensor6_stats` topic.
+. Let's query the `sensor6_stats` table to examine the data that is being written to it. First we need to define a Source Table associated with the `sensor6_stats` topic.
 +
 --
-.. Click on *Console* (on the left bar) *> Virtual Tables > Source Virtual Table > Add Source > Apache Kafka*.
+.. Click on *Console* (on the left bar) *> Tables > Add Table > Apache Kafka*
 .. On the *Kafka Source* window, enter the following information and click *Save changes*:
 +
 [source,yaml]

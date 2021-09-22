@@ -145,7 +145,6 @@ Schema Name:            ${schema.name} -> already set by default!
 [source]
 ----
 Schema Write Strategy:  HWX Schema Reference Attributes
-Schema Registry:        HortonworksSchemaRegistry
 ----
 +
 _JsonRecordSetWriter_ definition:

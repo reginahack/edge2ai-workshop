@@ -119,7 +119,7 @@ If your environment is healthy and all the steps from previous labs were complet
 +
 [source,sql]
 ----
-select *
+select count(*)
 from iot_enriched_source
 ----
 +

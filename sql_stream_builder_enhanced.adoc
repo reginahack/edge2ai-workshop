@@ -338,7 +338,7 @@ WARNING: Make sure to stop your queries to release all resources once you finish
 [source,shell]
 ----
 cd /opt/cloudera/parcels/FLINK/lib/flink/examples/streaming
-java -classpath streaming-flink-0.4.1.0.jar producer.KafkaLookupWeatherCondition edge2ai-1.dim.local:9092
+java -classpath kafka-producer-0.0.1.0.jar producer.KafkaLookupWeatherCondition edge2ai-1.dim.local:9092
 ----
 +
 . Define new virtual table *weather_condition*. To create a new Source Table, click on *Console* (on the left bar) *>  Tables > Add Table > Add Source > Flink DDL*.
